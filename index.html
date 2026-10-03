@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CloudTask v1.1</title>
+  <title>CloudTask v1.2</title>
  
   <style>
     * {
@@ -25,10 +25,10 @@
  
     .app {
       width: 100%;
-      max-width: 820px;
-      background: white;
+      max-width: 920px;
+      background: #ffffff;
       border-radius: 20px;
-      box-shadow: 0 20px 40px rgba(0,0,0,.2);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
       overflow: hidden;
     }
  
@@ -38,17 +38,22 @@
       padding: 35px 30px;
       text-align: center;
     }
-
+ 
     .header h1 {
       font-size: 34px;
       margin-bottom: 8px;
     }
+
+    .header p {
+      opacity: 0.9;
+      font-size: 15px;
+    }
  
     .version {
       display: inline-block;
-      margin-top: 12px;
+      margin-top: 14px;
+      background: rgba(255, 255, 255, 0.2);
       padding: 6px 16px;
-      background: rgba(255,255,255,.2);
       border-radius: 20px;
       font-weight: 600;
       font-size: 13px;
@@ -60,16 +65,17 @@
  
     .input-group {
       display: grid;
-      grid-template-columns: 1fr 160px 120px;
+      grid-template-columns: 1fr 150px 160px 110px;
       gap: 10px;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
  
     input, select {
-      padding: 14px;
+      padding: 13px;
       border: 2px solid #e0e7ff;
       border-radius: 12px;
       font-size: 15px;
+      background: white;
       outline: none;
     }
 
@@ -79,21 +85,30 @@
  
     #addTaskBtn {
       border: none;
+      border-radius: 12px;
       background: #4f46e5;
       color: white;
-      border-radius: 12px;
       font-weight: bold;
       cursor: pointer;
+      font-size: 15px;
+      transition: background-color 0.2s;
     }
 
     #addTaskBtn:hover {
       background: #4338ca;
     }
  
+    .control-panel {
+      display: grid;
+      grid-template-columns: 1fr 180px;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+ 
     .toolbar {
       display: flex;
       justify-content: space-between;
-      gap: 12px;
+      gap: 15px;
       margin-bottom: 20px;
       flex-wrap: wrap;
     }
@@ -137,25 +152,37 @@
     .task {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      gap: 12px;
       background: #ffffff;
       border: 1px solid #e2e8f0;
-      border-radius: 14px;
       padding: 16px 18px;
       margin-bottom: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+      border-radius: 14px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    }
+ 
+    .task.overdue {
+      border-left: 5px solid #dc2626;
     }
  
     .task-left {
       display: flex;
-      align-items: center;
-      gap: 12px;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .task-left input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      margin-top: 3px;
+      cursor: pointer;
+      accent-color: #4f46e5;
     }
  
     .task-info {
       display: flex;
       flex-direction: column;
-      gap: 5px;
+      gap: 6px;
     }
  
     .task.completed .task-text {
@@ -163,11 +190,18 @@
       color: #9ca3af;
     }
  
-    .priority {
-      width: fit-content;
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 12px;
+    }
+ 
+    .priority,
+    .date-badge,
+    .overdue-badge {
       padding: 4px 10px;
       border-radius: 12px;
-      font-size: 12px;
       font-weight: bold;
     }
  
@@ -186,20 +220,45 @@
       color: #b91c1c;
     }
  
+    .date-badge {
+      background: #e0f2fe;
+      color: #075985;
+    }
+ 
+    .overdue-badge {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+ 
+    .actions {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+ 
+    .edit-btn,
     .delete-btn {
       border: none;
-      background: #fef2f2;
-      color: #ef4444;
-      border-radius: 8px;
       padding: 8px 12px;
+      border-radius: 8px;
       font-weight: 600;
       cursor: pointer;
+    }
+ 
+    .edit-btn {
+      background: #e0f2fe;
+      color: #0369a1;
+    }
+ 
+    .delete-btn {
+      background: #fef2f2;
+      color: #ef4444;
     }
  
     .summary {
       margin-top: 22px;
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(3, 1fr);
       gap: 12px;
     }
  
@@ -215,7 +274,7 @@
     .summary-card strong {
       display: block;
       font-size: 24px;
-      margin-top: 5px;
+      margin-top: 4px;
     }
  
     .empty {
@@ -226,8 +285,8 @@
  
     footer {
       border-top: 1px solid #e2e8f0;
-      text-align: center;
       padding: 20px;
+      text-align: center;
       color: #64748b;
       font-size: 13px;
       line-height: 1.6;
@@ -238,10 +297,15 @@
       color: #334155;
     }
  
-    @media(max-width:700px) {
+    @media(max-width:800px) {
       .input-group,
+      .control-panel,
       .summary {
         grid-template-columns: 1fr;
+      }
+ 
+      .task {
+        flex-direction: column;
       }
     }
   </style>
@@ -254,19 +318,43 @@
   <div class="header">
     <h1>☁ CloudTask</h1>
     <p>Gestor de tareas interactivo</p>
-    <span class="version">Versión 1.1</span>
+    <span class="version">Versión 1.2</span>
   </div>
  
   <div class="content">
  
     <div class="input-group">
-      <input id="taskInput" type="text" placeholder="Escribe una nueva tarea...">
+      <input
+        id="taskInput"
+        type="text"
+        placeholder="Escribe una nueva tarea..."
+      >
+ 
       <select id="prioritySelect">
         <option value="baja">Prioridad baja</option>
         <option value="media" selected>Prioridad media</option>
         <option value="alta">Prioridad alta</option>
       </select>
-      <button id="addTaskBtn">Agregar</button>
+ 
+      <input id="dueDateInput" type="date">
+ 
+      <button id="addTaskBtn">
+        Agregar
+      </button>
+    </div>
+ 
+    <div class="control-panel">
+      <input
+        id="searchInput"
+        type="text"
+        placeholder="Buscar tareas..."
+      >
+ 
+      <select id="sortSelect">
+        <option value="default">Orden original</option>
+        <option value="priority">Por prioridad</option>
+        <option value="date">Por fecha límite</option>
+      </select>
     </div>
  
     <div class="toolbar">
@@ -275,26 +363,35 @@
         <button class="filter-btn" data-filter="pending">Pendientes</button>
         <button class="filter-btn" data-filter="completed">Completadas</button>
       </div>
-      <button id="clearCompletedBtn" class="clear-btn">Eliminar completadas</button>
+ 
+      <button id="clearCompletedBtn" class="clear-btn">
+        Eliminar completadas
+      </button>
     </div>
  
     <ul id="taskList" class="task-list"></ul>
  
     <div class="summary">
       <div class="summary-card">
-        Total de tareas
+        Total
         <strong id="totalCount">0</strong>
       </div>
+ 
       <div class="summary-card">
-        Tareas pendientes
+        Pendientes
         <strong id="pendingCount">0</strong>
+      </div>
+ 
+      <div class="summary-card">
+        Vencidas
+        <strong id="overdueCount">0</strong>
       </div>
     </div>
  
   </div>
  
   <footer>
-    CloudTask v1.1 · GitHub + Vercel / Netlify<br>
+    CloudTask v1.2 · GitHub + Vercel / Netlify<br>
     Desarrollado por: <strong>ARTEAGA NAVARRETE ANTHONY JOSE</strong>, <strong>YORDY GREGORIO MENDOZA VASQUEZ</strong> y <strong>MARIA VALERIA VALENCIA CEDEÑO</strong>
   </footer>
  
@@ -303,22 +400,49 @@
 <script>
   const taskInput = document.getElementById("taskInput");
   const prioritySelect = document.getElementById("prioritySelect");
+  const dueDateInput = document.getElementById("dueDateInput");
   const addTaskBtn = document.getElementById("addTaskBtn");
+ 
   const taskList = document.getElementById("taskList");
-  const pendingCount = document.getElementById("pendingCount");
+ 
   const totalCount = document.getElementById("totalCount");
+  const pendingCount = document.getElementById("pendingCount");
+  const overdueCount = document.getElementById("overdueCount");
+ 
   const filterButtons = document.querySelectorAll(".filter-btn");
   const clearCompletedBtn = document.getElementById("clearCompletedBtn");
  
+  const searchInput = document.getElementById("searchInput");
+  const sortSelect = document.getElementById("sortSelect");
+ 
   let currentFilter = "all";
+  let editingId = null;
  
   let tasks = JSON.parse(localStorage.getItem("cloudTaskTasks"));
  
   if (!tasks) {
     tasks = [
-      { id: 1, text: "Subir proyecto a GitHub", completed: false, priority: "alta" },
-      { id: 2, text: "Desplegar aplicación en Vercel", completed: false, priority: "media" },
-      { id: 3, text: "Probar aplicación desde el teléfono", completed: true, priority: "baja" }
+      {
+        id: 1,
+        text: "Subir proyecto a GitHub",
+        completed: false,
+        priority: "alta",
+        dueDate: ""
+      },
+      {
+        id: 2,
+        text: "Desplegar aplicación en Vercel",
+        completed: false,
+        priority: "media",
+        dueDate: ""
+      },
+      {
+        id: 3,
+        text: "Probar aplicación desde el teléfono",
+        completed: true,
+        priority: "baja",
+        dueDate: ""
+      }
     ];
   }
  
@@ -326,35 +450,101 @@
     localStorage.setItem("cloudTaskTasks", JSON.stringify(tasks));
   }
  
+  function isOverdue(task) {
+    if (!task.dueDate || task.completed) {
+      return false;
+    }
+ 
+    const today = new Date();
+    today.setHours(0,0,0,0);
+ 
+    const due = new Date(task.dueDate + "T00:00:00");
+ 
+    return due < today;
+  }
+ 
   function renderTasks() {
     taskList.innerHTML = "";
  
-    const filteredTasks = tasks.filter(task => {
-      if (currentFilter === "pending") return !task.completed;
-      if (currentFilter === "completed") return task.completed;
-      return true;
-    });
+    let visibleTasks = [...tasks];
  
-    if (filteredTasks.length === 0) {
+    if (currentFilter === "pending") {
+      visibleTasks = visibleTasks.filter(task => !task.completed);
+    }
+ 
+    if (currentFilter === "completed") {
+      visibleTasks = visibleTasks.filter(task => task.completed);
+    }
+ 
+    const searchText = searchInput.value.toLowerCase().trim();
+ 
+    if (searchText) {
+      visibleTasks = visibleTasks.filter(task =>
+        task.text.toLowerCase().includes(searchText)
+      );
+    }
+ 
+    if (sortSelect.value === "priority") {
+      const order = { alta: 1, media: 2, baja: 3 };
+      visibleTasks.sort((a,b) => order[a.priority] - order[b.priority]);
+    }
+ 
+    if (sortSelect.value === "date") {
+      visibleTasks.sort((a,b) => {
+        if (!a.dueDate) return 1;
+        if (!b.dueDate) return -1;
+        return new Date(a.dueDate) - new Date(b.dueDate);
+      });
+    }
+ 
+    if (visibleTasks.length === 0) {
       taskList.innerHTML = '<li class="empty">No hay tareas para mostrar</li>';
     }
  
-    filteredTasks.forEach(task => {
-      const priorityText = { baja: "Baja", media: "Media", alta: "Alta" };
+    visibleTasks.forEach(task => {
       const li = document.createElement("li");
       li.className = "task";
  
       if (task.completed) li.classList.add("completed");
+      if (isOverdue(task)) li.classList.add("overdue");
+ 
+      const priorityText = { baja: "Baja", media: "Media", alta: "Alta" };
+ 
+      const dateHtml = task.dueDate
+        ? `<span class="date-badge">Fecha: ${task.dueDate}</span>`
+        : "";
+ 
+      const overdueHtml = isOverdue(task)
+        ? `<span class="overdue-badge">Vencida</span>`
+        : "";
  
       li.innerHTML = `
         <div class="task-left">
-          <input type="checkbox" ${task.completed ? "checked" : ""} onchange="toggleTask(${task.id})">
+          <input
+            type="checkbox"
+            ${task.completed ? "checked" : ""}
+            onchange="toggleTask(${task.id})"
+          >
           <div class="task-info">
             <span class="task-text">${task.text}</span>
-            <span class="priority priority-${task.priority}">Prioridad ${priorityText[task.priority]}</span>
+            <div class="meta">
+              <span class="priority priority-${task.priority}">
+                Prioridad ${priorityText[task.priority]}
+              </span>
+              ${dateHtml}
+              ${overdueHtml}
+            </div>
           </div>
         </div>
-        <button class="delete-btn" onclick="deleteTask(${task.id})">Eliminar</button>
+
+        <div class="actions">
+          <button class="edit-btn" onclick="editTask(${task.id})">
+            Editar
+          </button>
+          <button class="delete-btn" onclick="deleteTask(${task.id})">
+            Eliminar
+          </button>
+        </div>
       `;
  
       taskList.appendChild(li);
@@ -364,21 +554,60 @@
     saveTasks();
   }
  
-  function addTask() {
+  function addOrUpdateTask() {
     const text = taskInput.value.trim();
+ 
     if (!text) {
       alert("Escribe una tarea.");
       return;
     }
  
-    tasks.push({ id: Date.now(), text, completed: false, priority: prioritySelect.value });
+    const priority = prioritySelect.value;
+    const dueDate = dueDateInput.value;
+ 
+    if (editingId !== null) {
+      tasks = tasks.map(task =>
+        task.id === editingId
+          ? { ...task, text, priority, dueDate }
+          : task
+      );
+ 
+      editingId = null;
+      addTaskBtn.textContent = "Agregar";
+    } else {
+      tasks.push({
+        id: Date.now(),
+        text,
+        completed: false,
+        priority,
+        dueDate
+      });
+    }
+ 
     taskInput.value = "";
     prioritySelect.value = "media";
+    dueDateInput.value = "";
+ 
     renderTasks();
   }
  
+  function editTask(id) {
+    const task = tasks.find(task => task.id === id);
+    if (!task) return;
+ 
+    taskInput.value = task.text;
+    prioritySelect.value = task.priority;
+    dueDateInput.value = task.dueDate || "";
+ 
+    editingId = id;
+    addTaskBtn.textContent = "Guardar";
+    taskInput.focus();
+  }
+ 
   function toggleTask(id) {
-    tasks = tasks.map(task => task.id === id ? { ...task, completed: !task.completed } : task);
+    tasks = tasks.map(task =>
+      task.id === id ? { ...task, completed: !task.completed } : task
+    );
     renderTasks();
   }
  
@@ -388,10 +617,6 @@
   }
  
   function clearCompletedTasks() {
-    if (!tasks.some(task => task.completed)) {
-      alert("No hay tareas completadas.");
-      return;
-    }
     if (confirm("¿Eliminar todas las tareas completadas?")) {
       tasks = tasks.filter(task => !task.completed);
       renderTasks();
@@ -401,11 +626,16 @@
   function updateCounters() {
     totalCount.textContent = tasks.length;
     pendingCount.textContent = tasks.filter(task => !task.completed).length;
+    overdueCount.textContent = tasks.filter(isOverdue).length;
   }
  
-  addTaskBtn.addEventListener("click", addTask);
-  taskInput.addEventListener("keypress", event => { if (event.key === "Enter") addTask(); });
+  addTaskBtn.addEventListener("click", addOrUpdateTask);
+  taskInput.addEventListener("keypress", event => {
+    if (event.key === "Enter") addOrUpdateTask();
+  });
   clearCompletedBtn.addEventListener("click", clearCompletedTasks);
+  searchInput.addEventListener("input", renderTasks);
+  sortSelect.addEventListener("change", renderTasks);
  
   filterButtons.forEach(button => {
     button.addEventListener("click", function() {
